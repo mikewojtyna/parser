@@ -3,6 +3,7 @@
  */
 package com.ef.parser.api.impl;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -35,9 +36,18 @@ public class AccessLogParser implements LogParser
 
 	private final Charset encoding;
 
+	/**
+	 * @param delimiter
+	 *                a delimiter to separate tokens in log entry
+	 * @param encoding
+	 *                an encoding used in source stream
+	 * @param dateFormat
+	 *                a date format to be used to parse log entry date
+	 */
 	public AccessLogParser(String delimiter, Charset encoding,
 		String dateFormat)
 	{
+		validate(delimiter, encoding, dateFormat);
 		this.delimiter = delimiter;
 		this.encoding = encoding;
 		dateFormatter = DateTimeFormatter.ofPattern(dateFormat);
@@ -50,6 +60,7 @@ public class AccessLogParser implements LogParser
 	public List<LogEntry> parse(InputStream source)
 		throws NullPointerException, LogParserException
 	{
+		validate(source);
 		try
 		{
 			return IOUtils.readLines(source, encoding).stream()
@@ -111,6 +122,27 @@ public class AccessLogParser implements LogParser
 	{
 		return new LogParserException(
 			COMMON_EX_MSG + " " + detailedMsg);
+	}
+
+	/**
+	 * @param source
+	 */
+	private void validate(InputStream source)
+	{
+		checkNotNull(source, "'source' cannot be null");
+	}
+
+	/**
+	 * @param delimiter
+	 * @param encoding
+	 * @param dateFormat
+	 */
+	private void validate(String delimiter, Charset encoding,
+		String dateFormat)
+	{
+		checkNotNull(delimiter, "'delimiter' cannot be null");
+		checkNotNull(encoding, "'encoding' cannot be null");
+		checkNotNull(dateFormat, "'dateFormat' cannot be null");
 	}
 
 }

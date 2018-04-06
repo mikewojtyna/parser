@@ -18,6 +18,7 @@ import org.junit.Before;
 import org.junit.Test;
 import com.ef.parser.api.LogEntry.LogEntryBuilder;
 import com.ef.parser.api.impl.AccessLogParser;
+import com.google.common.testing.NullPointerTester;
 
 /**
  * @author goobar
@@ -186,6 +187,14 @@ public class AccessLogParserTest
 		// then
 		assertThat(entries.get(0).getStatusCode())
 			.isEqualTo(expectedStatusCode);
+	}
+
+	@Test
+	public void should_Pass_NullTests() throws Exception
+	{
+		NullPointerTester tester = new NullPointerTester();
+		tester.testAllPublicConstructors(AccessLogParser.class);
+		tester.testAllPublicInstanceMethods(parser());
 	}
 
 	@Test
