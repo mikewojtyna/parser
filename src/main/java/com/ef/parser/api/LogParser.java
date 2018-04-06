@@ -4,7 +4,7 @@
 package com.ef.parser.api;
 
 import java.io.InputStream;
-import java.util.stream.Stream;
+import java.util.List;
 
 /**
  * A parser to extract log entries from logs source.
@@ -20,12 +20,12 @@ public interface LogParser
 	 *
 	 * @param source
 	 *                an input stream containing log entries
-	 * @return the stream containing all extracted entries
+	 * @return the list containing all extracted entries (in the same order)
 	 * @throws NullPointerException
 	 *                 if any argument is null
 	 * @throws LogParserException
 	 *                 if parser fails
 	 */
-	Stream<LogEntry> parse(InputStream source)
+	List<LogEntry> parse(InputStream source)
 		throws NullPointerException, LogParserException;
 }

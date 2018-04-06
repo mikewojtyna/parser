@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.After;
@@ -22,10 +23,14 @@ import com.ef.parser.api.impl.AccessLogParser;
  * @author goobar
  *
  */
+@SuppressWarnings("javadoc")
 public class AccessLogParserTest
 {
 
-	private static final Charset ENCODING = Charset.forName("UTF-8");
+	private static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
+
+	private static final Charset DEFAULT_ENCODING = Charset
+		.forName("UTF-8");
 
 	private static final String PIPE_DELIMITER_LINE = "2017-01-01 00:00:11.763|192.168.234.82|\"GET / HTTP/1.1\"|200|\"swcd (unknown version) CFNetwork/808.2.16 Darwin/15.6.0\"";
 
@@ -56,7 +61,7 @@ public class AccessLogParserTest
 			.build();
 
 		// when
-		Stream<LogEntry> entries = parser.parse(source);
+		List<LogEntry> entries = parser.parse(source);
 
 		// then
 		assertThat(entries).containsExactly(expectedEntry,
@@ -79,10 +84,10 @@ public class AccessLogParserTest
 			.withUserAgent("\"fake user agent\"").build();
 
 		// when
-		Stream<LogEntry> entries = logParser.parse(source);
+		List<LogEntry> entries = logParser.parse(source);
 
 		// then
-		assertThat(entries.findFirst().get()).isEqualTo(expectedEntry);
+		assertThat(entries.get(0)).isEqualTo(expectedEntry);
 	}
 
 	@Test
@@ -95,11 +100,31 @@ public class AccessLogParserTest
 			11, 763_000_000);
 
 		// when
-		Stream<LogEntry> entries = logParser.parse(source);
+		List<LogEntry> entries = logParser.parse(source);
 
 		// then
-		assertThat(entries.findFirst().get().getDate())
-			.isEqualTo(expectedDate);
+		assertThat(entries.get(0).getDate()).isEqualTo(expectedDate);
+	}
+
+	@Test
+	public void should_ParseDateProperty_When_UsingCustomDateFormat()
+		throws Exception
+	{
+		// given
+		// date is given in format "dd-MM-yyyy HH:mm:ss.SSS"
+		String dateFormat = "dd-MM-yyyy HH:mm:ss.SSS";
+		LogParser logParser = parserWithPipeDelimiterAndDateFormat(
+			dateFormat);
+		InputStream source = singleLineSource(
+			"13-10-2017 00:00:10.123|192.168.234.82|\"GET / HTTP/1.1\"|200|\"swcd (unknown version) CFNetwork/808.2.16 Darwin/15.6.0\"");
+		LocalDateTime expectedDate = LocalDateTime.of(2017, 10, 13, 0,
+			0, 10, 123_000_000);
+
+		// when
+		List<LogEntry> entries = logParser.parse(source);
+
+		// then
+		assertThat(entries.get(0).getDate()).isEqualTo(expectedDate);
 	}
 
 	@Test
@@ -111,11 +136,10 @@ public class AccessLogParserTest
 		String expectedIp = "192.168.234.82";
 
 		// when
-		Stream<LogEntry> entries = logParser.parse(source);
+		List<LogEntry> entries = logParser.parse(source);
 
 		// then
-		assertThat(entries.findFirst().get().getIp())
-			.isEqualTo(expectedIp);
+		assertThat(entries.get(0).getIp()).isEqualTo(expectedIp);
 	}
 
 	@Test
@@ -127,10 +151,10 @@ public class AccessLogParserTest
 		String expectedRequest = "\"GET / HTTP/1.1\"";
 
 		// when
-		Stream<LogEntry> entries = logParser.parse(source);
+		List<LogEntry> entries = logParser.parse(source);
 
 		// then
-		assertThat(entries.findFirst().get().getRequest())
+		assertThat(entries.get(0).getRequest())
 			.isEqualTo(expectedRequest);
 	}
 
@@ -142,7 +166,7 @@ public class AccessLogParserTest
 		LogParser logParser = parser();
 
 		// when
-		Stream<LogEntry> entries = logParser.parse(source);
+		List<LogEntry> entries = logParser.parse(source);
 
 		// then
 		assertThat(entries).hasSize(1);
@@ -157,11 +181,64 @@ public class AccessLogParserTest
 		String expectedStatusCode = "200";
 
 		// when
-		Stream<LogEntry> entries = logParser.parse(source);
+		List<LogEntry> entries = logParser.parse(source);
 
 		// then
-		assertThat(entries.findFirst().get().getStatusCode())
+		assertThat(entries.get(0).getStatusCode())
 			.isEqualTo(expectedStatusCode);
+	}
+
+	@Test
+	public void should_ThrowException_When_LogEntryHasBadDateFormat()
+		throws Exception
+	{
+		// given
+		LogParser logParser = parserWithPipeDelimiter();
+		// log entry has bad date format - only date (without time) is
+		// given
+		InputStream source = singleLineSource(
+			"2017-01-01|192.168.234.82|\"GET / HTTP/1.1\"|200|\"swcd (unknown version) CFNetwork/808.2.16 Darwin/15.6.0\"");
+
+		// when
+		assertThatThrownBy(() -> logParser.parse(source))
+
+			// then
+			.isInstanceOf(LogParserException.class);
+	}
+
+	@Test
+	public void should_ThrowException_When_LogEntryHasNoRightDelimiter()
+		throws Exception
+	{
+		// given
+		LogParser logParser = parserWithPipeDelimiter();
+		// source is missing the "|" delimiter - instead, # is used
+		InputStream source = singleLineSource(
+			"2017-01-01 00:00:11.763#192.168.234.82#\"GET / HTTP/1.1\"#200#\"fake user agent\"");
+
+		// when
+		assertThatThrownBy(() -> logParser.parse(source))
+
+			// then
+			.isInstanceOf(LogParserException.class);
+	}
+
+	@Test
+	public void should_ThrowException_When_LogEntryHasNotEnoughFields()
+		throws Exception
+	{
+		// given
+		LogParser logParser = parserWithPipeDelimiter();
+		// log entry has not enough "|" delimiters - we expect 5, while
+		// there are only 2
+		InputStream source = singleLineSource(
+			"2017-01-01 00:00:11.763|192.168.234.82");
+
+		// when
+		assertThatThrownBy(() -> logParser.parse(source))
+
+			// then
+			.isInstanceOf(LogParserException.class);
 	}
 
 	@Test
@@ -188,10 +265,10 @@ public class AccessLogParserTest
 		String expectedUserAgent = "\"swcd (unknown version) CFNetwork/808.2.16 Darwin/15.6.0\"";
 
 		// when
-		Stream<LogEntry> entries = logParser.parse(source);
+		List<LogEntry> entries = logParser.parse(source);
 
 		// then
-		assertThat(entries.findFirst().get().getUserAgent())
+		assertThat(entries.get(0).getUserAgent())
 			.isEqualTo(expectedUserAgent);
 	}
 
@@ -227,7 +304,7 @@ public class AccessLogParserTest
 	{
 		return new ByteArrayInputStream(Stream.of(string)
 			.collect(Collectors.joining(System.lineSeparator()))
-			.getBytes(ENCODING));
+			.getBytes(DEFAULT_ENCODING));
 	}
 
 	/**
@@ -244,7 +321,8 @@ public class AccessLogParserTest
 	 */
 	private LogParser parserWithDelimiter(String delimiter)
 	{
-		return new AccessLogParser(delimiter, ENCODING);
+		return new AccessLogParser(delimiter, DEFAULT_ENCODING,
+			DEFAULT_DATE_FORMAT);
 	}
 
 	/**
@@ -253,6 +331,16 @@ public class AccessLogParserTest
 	private LogParser parserWithPipeDelimiter()
 	{
 		return parserWithDelimiter("\\|");
+	}
+
+	/**
+	 * @param dateFormat
+	 * @return
+	 */
+	private LogParser parserWithPipeDelimiterAndDateFormat(
+		String dateFormat)
+	{
+		return new AccessLogParser("\\|", DEFAULT_ENCODING, dateFormat);
 	}
 
 	/**
@@ -269,7 +357,8 @@ public class AccessLogParserTest
 	 */
 	private InputStream singleLineSource(String line)
 	{
-		return new ByteArrayInputStream(line.getBytes(ENCODING));
+		return new ByteArrayInputStream(
+			line.getBytes(DEFAULT_ENCODING));
 	}
 
 }
