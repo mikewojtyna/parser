@@ -12,7 +12,7 @@ import java.util.Collection;
  * @author goobar
  *
  */
-public interface ThresholdFinder
+public interface ThresholdIpFinder
 {
 	/**
 	 * Finds all IPs which made more requests than {@code threshold} value
