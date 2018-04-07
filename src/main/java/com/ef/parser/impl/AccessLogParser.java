@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.ef.parser.api.impl;
+package com.ef.parser.impl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import java.io.IOException;
@@ -14,10 +14,10 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
-import com.ef.parser.api.LogEntry;
-import com.ef.parser.api.LogEntry.LogEntryBuilder;
-import com.ef.parser.api.LogParser;
-import com.ef.parser.api.LogParserException;
+import com.ef.parser.LogEntry;
+import com.ef.parser.LogEntry.LogEntryBuilder;
+import com.ef.parser.LogParser;
+import com.ef.parser.LogParserException;
 
 /**
  * This implementation is able to parse Apache "access.log"-like text logs.

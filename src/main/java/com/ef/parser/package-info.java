@@ -2,8 +2,7 @@
  *
  */
 /**
- * A simple log parser CLI application. See {@link com.ef.parser.api.api} to
- * understand the available parser API.
+ * Contains {@link com.ef.parser.LogParser} interface defining the parser API.
  *
  * @author goobar
  *

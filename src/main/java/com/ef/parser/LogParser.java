@@ -1,13 +1,13 @@
 /**
  *
  */
-package com.ef.parser.api;
+package com.ef.parser;
 
 import java.io.InputStream;
 import java.util.List;
 
 /**
- * A parser to extract log entries from logs source.
+ * A parser to extract log entries from log source.
  *
  * @author goobar
  *
@@ -15,8 +15,8 @@ import java.util.List;
 public interface LogParser
 {
 	/**
-	 * Parses the given source (most probably a file stream) and extracts
-	 * all available
+	 * Parses the given log source (e.g. a file stream) and extracts all
+	 * available entries.
 	 *
 	 * @param source
 	 *                an input stream containing log entries

@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.ef.parser.api;
+package com.ef.parser;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -16,8 +16,11 @@ import java.util.stream.Stream;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import com.ef.parser.api.LogEntry.LogEntryBuilder;
-import com.ef.parser.api.impl.AccessLogParser;
+import com.ef.parser.LogEntry;
+import com.ef.parser.LogEntry.LogEntryBuilder;
+import com.ef.parser.LogParser;
+import com.ef.parser.LogParserException;
+import com.ef.parser.impl.AccessLogParser;
 import com.google.common.testing.NullPointerTester;
 
 /**

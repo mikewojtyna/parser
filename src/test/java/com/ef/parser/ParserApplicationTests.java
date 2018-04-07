@@ -1,4 +1,4 @@
-package com.ef.parser.api;
+package com.ef.parser;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

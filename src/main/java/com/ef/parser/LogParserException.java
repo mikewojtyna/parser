@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.ef.parser.api;
+package com.ef.parser;
 
 /**
  * @author goobar
