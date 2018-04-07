@@ -4,11 +4,16 @@
 package com.ef.parser;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 /**
+ * A simple data object representing a log entry. To create an instance of this
+ * class use {@link LogEntryBuilder}.
+ *
  * @author goobar
  *
  */
+@SuppressWarnings("javadoc")
 public class LogEntry
 {
 	private final LocalDateTime date;
@@ -110,41 +115,41 @@ public class LogEntry
 	/**
 	 * @return the date
 	 */
-	public LocalDateTime getDate()
+	public Optional<LocalDateTime> getDate()
 	{
-		return date;
+		return Optional.ofNullable(date);
 	}
 
 	/**
 	 * @return the ip
 	 */
-	public String getIp()
+	public Optional<String> getIp()
 	{
-		return ip;
+		return Optional.ofNullable(ip);
 	}
 
 	/**
 	 * @return the request
 	 */
-	public String getRequest()
+	public Optional<String> getRequest()
 	{
-		return request;
+		return Optional.ofNullable(request);
 	}
 
 	/**
 	 * @return the statusCode
 	 */
-	public String getStatusCode()
+	public Optional<String> getStatusCode()
 	{
-		return statusCode;
+		return Optional.ofNullable(statusCode);
 	}
 
 	/**
 	 * @return
 	 */
-	public String getUserAgent()
+	public Optional<String> getUserAgent()
 	{
-		return userAgent;
+		return Optional.ofNullable(userAgent);
 	}
 
 	/* (non-Javadoc)

@@ -16,10 +16,7 @@ import java.util.stream.Stream;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import com.ef.parser.LogEntry;
 import com.ef.parser.LogEntry.LogEntryBuilder;
-import com.ef.parser.LogParser;
-import com.ef.parser.LogParserException;
 import com.ef.parser.impl.AccessLogParser;
 import com.google.common.testing.NullPointerTester;
 
@@ -107,7 +104,8 @@ public class AccessLogParserTest
 		List<LogEntry> entries = logParser.parse(source);
 
 		// then
-		assertThat(entries.get(0).getDate()).isEqualTo(expectedDate);
+		assertThat(entries.get(0).getDate().get())
+			.isEqualTo(expectedDate);
 	}
 
 	@Test
@@ -128,7 +126,8 @@ public class AccessLogParserTest
 		List<LogEntry> entries = logParser.parse(source);
 
 		// then
-		assertThat(entries.get(0).getDate()).isEqualTo(expectedDate);
+		assertThat(entries.get(0).getDate().get())
+			.isEqualTo(expectedDate);
 	}
 
 	@Test
@@ -143,7 +142,7 @@ public class AccessLogParserTest
 		List<LogEntry> entries = logParser.parse(source);
 
 		// then
-		assertThat(entries.get(0).getIp()).isEqualTo(expectedIp);
+		assertThat(entries.get(0).getIp().get()).isEqualTo(expectedIp);
 	}
 
 	@Test
@@ -158,7 +157,7 @@ public class AccessLogParserTest
 		List<LogEntry> entries = logParser.parse(source);
 
 		// then
-		assertThat(entries.get(0).getRequest())
+		assertThat(entries.get(0).getRequest().get())
 			.isEqualTo(expectedRequest);
 	}
 
@@ -188,8 +187,24 @@ public class AccessLogParserTest
 		List<LogEntry> entries = logParser.parse(source);
 
 		// then
-		assertThat(entries.get(0).getStatusCode())
+		assertThat(entries.get(0).getStatusCode().get())
 			.isEqualTo(expectedStatusCode);
+	}
+
+	@Test
+	public void should_ParseUserAgentProperty() throws Exception
+	{
+		// given
+		LogParser logParser = parserWithPipeDelimiter();
+		InputStream source = singleLineSource(PIPE_DELIMITER_LINE);
+		String expectedUserAgent = "\"swcd (unknown version) CFNetwork/808.2.16 Darwin/15.6.0\"";
+
+		// when
+		List<LogEntry> entries = logParser.parse(source);
+
+		// then
+		assertThat(entries.get(0).getUserAgent().get())
+			.isEqualTo(expectedUserAgent);
 	}
 
 	@Test
@@ -266,22 +281,6 @@ public class AccessLogParserTest
 
 			// then
 			.isInstanceOf(LogParserException.class);
-	}
-
-	@Test
-	public void should_UserAgentProperty() throws Exception
-	{
-		// given
-		LogParser logParser = parserWithPipeDelimiter();
-		InputStream source = singleLineSource(PIPE_DELIMITER_LINE);
-		String expectedUserAgent = "\"swcd (unknown version) CFNetwork/808.2.16 Darwin/15.6.0\"";
-
-		// when
-		List<LogEntry> entries = logParser.parse(source);
-
-		// then
-		assertThat(entries.get(0).getUserAgent())
-			.isEqualTo(expectedUserAgent);
 	}
 
 	/**
