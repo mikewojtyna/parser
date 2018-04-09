@@ -44,7 +44,7 @@ public class LogEntryRepositoryIntegrationTest
 			45);
 		LocalDateTime endDate = LocalDateTime.of(2010, 10, 16, 20, 45);
 		int threshold = 2;
-		// only 89.75.165.209 and 89.75.165.211 appears more than 2
+		// only 89.75.165.209 and 89.75.165.211 appear more than 2
 		// times in given date range
 		// 89.75.165.210 appears 4 times, but in the wrong range
 		repository.saveAll(Arrays.asList(
