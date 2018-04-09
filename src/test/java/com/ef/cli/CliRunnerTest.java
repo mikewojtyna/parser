@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.ef;
+package com.ef.cli;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
