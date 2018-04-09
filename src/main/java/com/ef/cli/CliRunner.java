@@ -93,7 +93,7 @@ public class CliRunner implements ApplicationRunner
 	private void handleIpFinderArgs(ApplicationArguments args)
 	{
 		ipFinder.findAboveThreshold(threshold(args), startDate(args),
-			duration(args));
+			duration(args)).forEach(LOGGER::info);
 	}
 
 	/**
