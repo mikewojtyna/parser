@@ -6,6 +6,7 @@ package com.ef.api.impl;
 import static com.google.common.base.Preconditions.checkNotNull;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import org.springframework.stereotype.Service;
 import com.ef.api.Duration;
 import com.ef.api.ThresholdFinderException;
 import com.ef.api.ThresholdIpFinder;
@@ -17,6 +18,7 @@ import com.ef.repository.LogEntryRepository;
  * @author goobar
  *
  */
+@Service
 public class RepositoryThresholdIpFinder implements ThresholdIpFinder
 {
 
