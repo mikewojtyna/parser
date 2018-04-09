@@ -7,12 +7,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.boot.DefaultApplicationArguments;
 import com.ef.api.Duration;
+import com.ef.api.LogImporter;
 import com.ef.api.ThresholdIpFinder;
 import com.ef.cli.CliRunner;
 
@@ -26,6 +28,8 @@ public class CliRunnerTest
 
 	private ThresholdIpFinder ipFinder;
 
+	private LogImporter logImporter;
+
 	private CliRunner runner;
 
 	/**
@@ -34,8 +38,28 @@ public class CliRunnerTest
 	@Before
 	public void setUp() throws Exception
 	{
+		logImporter = mock(LogImporter.class);
 		ipFinder = mock(ThresholdIpFinder.class);
-		runner = new CliRunner(ipFinder);
+		runner = new CliRunner(ipFinder, logImporter);
+	}
+
+	@Test
+	public void should_HandleAllArgs() throws Exception
+	{
+		// given
+		DefaultApplicationArguments args = new DefaultApplicationArguments(
+			new String[] { "--accesslog=/path/to/file",
+				"--startDate=2017-01-01.13:00:00",
+				"--duration=daily", "--threshold=250" });
+
+		// when
+		runner.run(args);
+
+		// then
+		verify(logImporter, times(1))
+			.importLogFile(Paths.get("/path/to/file"));
+		verify(ipFinder, times(1)).findAboveThreshold(250,
+			LocalDateTime.of(2017, 1, 1, 13, 0, 0), Duration.DAILY);
 	}
 
 	@Test
@@ -131,6 +155,36 @@ public class CliRunnerTest
 
 		// then
 		verifyZeroInteractions(ipFinder);
+	}
+
+	@Test
+	public void should_NotInteractWithLogImporter_When_AccessLogArgHasNoValue()
+		throws Exception
+	{
+		// given
+		DefaultApplicationArguments args = new DefaultApplicationArguments(
+			new String[] { "--accesslog" });
+
+		// when
+		runner.run(args);
+
+		// then
+		verifyZeroInteractions(logImporter);
+	}
+
+	@Test
+	public void should_ParseAccessLogArg() throws Exception
+	{
+		// given
+		DefaultApplicationArguments args = new DefaultApplicationArguments(
+			new String[] { "--accesslog=/path/to/file" });
+
+		// when
+		runner.run(args);
+
+		// then
+		verify(logImporter, times(1))
+			.importLogFile(Paths.get("/path/to/file"));
 	}
 
 	@Test
