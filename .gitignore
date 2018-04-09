@@ -1,3 +1,4 @@
+create.sql
 spring-shell.log
 /target/
 !.mvn/wrapper/maven-wrapper.jar
