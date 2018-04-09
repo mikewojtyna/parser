@@ -35,7 +35,7 @@
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava-testlib</artifactId>
 			<version>24.1-jre</version>
-			<scope>test</scope>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
