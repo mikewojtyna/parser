@@ -34,6 +34,18 @@ public class LogEntry
 
 	private final String userAgent;
 
+	/**
+	 * Do not use. Required only by Hibernate.
+	 */
+	private LogEntry()
+	{
+		ip = null;
+		request = null;
+		statusCode = null;
+		userAgent = null;
+		date = null;
+	}
+
 	private LogEntry(LogEntryBuilder builder)
 	{
 		date = builder.date;
@@ -43,8 +55,8 @@ public class LogEntry
 		userAgent = builder.userAgent;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
+	/**
+	 * Id is not included in equals and hashcode implementations.
 	 */
 	@Override
 	public boolean equals(Object obj)
@@ -70,10 +82,6 @@ public class LogEntry
 			}
 		}
 		else if (!date.equals(other.date))
-		{
-			return false;
-		}
-		if (id != other.id)
 		{
 			return false;
 		}
@@ -174,7 +182,6 @@ public class LogEntry
 		int result = 1;
 		result = prime * result
 			+ ((date == null) ? 0 : date.hashCode());
-		result = prime * result + (int) (id ^ (id >>> 32));
 		result = prime * result + ((ip == null) ? 0 : ip.hashCode());
 		result = prime * result
 			+ ((request == null) ? 0 : request.hashCode());
@@ -191,8 +198,8 @@ public class LogEntry
 	@Override
 	public String toString()
 	{
-		return "LogEntry [date=" + date + ", ip=" + ip + ", request="
-			+ request + ", statusCode=" + statusCode
+		return "LogEntry [date=" + date + ", id=" + id + ", ip=" + ip
+			+ ", request=" + request + ", statusCode=" + statusCode
 			+ ", userAgent=" + userAgent + "]";
 	}
 

@@ -45,7 +45,7 @@ public class LogEntryTest
 	public void should_Pass_EqualsTests() throws Exception
 	{
 		EqualsVerifier.forClass(LogEntry.class).usingGetClass()
-			.verify();
+			.withIgnoredFields("id").verify();
 	}
 
 	@Test
