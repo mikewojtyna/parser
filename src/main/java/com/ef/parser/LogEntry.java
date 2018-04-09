@@ -5,6 +5,9 @@ package com.ef.parser;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
 /**
  * A simple data object representing a log entry. To create an instance of this
@@ -14,9 +17,14 @@ import java.util.Optional;
  *
  */
 @SuppressWarnings("javadoc")
+@Entity
 public class LogEntry
 {
 	private final LocalDateTime date;
+
+	@Id
+	@GeneratedValue
+	private long id;
 
 	private final String ip;
 
@@ -62,6 +70,10 @@ public class LogEntry
 			}
 		}
 		else if (!date.equals(other.date))
+		{
+			return false;
+		}
+		if (id != other.id)
 		{
 			return false;
 		}
@@ -162,6 +174,7 @@ public class LogEntry
 		int result = 1;
 		result = prime * result
 			+ ((date == null) ? 0 : date.hashCode());
+		result = prime * result + (int) (id ^ (id >>> 32));
 		result = prime * result + ((ip == null) ? 0 : ip.hashCode());
 		result = prime * result
 			+ ((request == null) ? 0 : request.hashCode());
