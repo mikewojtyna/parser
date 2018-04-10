@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.ef.repository;
+package com.ef.api.impl;
 
 import java.time.LocalDateTime;
 import java.util.Collection;

@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import com.ef.api.LogImporter;
 import com.ef.api.LogImporterException;
 import com.ef.parser.LogParser;
-import com.ef.repository.LogEntryRepository;
 
 /**
  * A Log importer that uses {@link LogEntryRepository} to stored results parsed

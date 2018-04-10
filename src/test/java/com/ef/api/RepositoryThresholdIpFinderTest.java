@@ -14,8 +14,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import com.ef.api.impl.BlockedIpRepository;
+import com.ef.api.impl.LogEntryRepository;
 import com.ef.api.impl.RepositoryThresholdIpFinder;
-import com.ef.repository.LogEntryRepository;
 import com.google.common.testing.NullPointerTester;
 
 /**

@@ -16,8 +16,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import com.ef.api.impl.BlockedIp;
 import com.ef.api.impl.BlockedIpRepository;
+import com.ef.api.impl.LogEntryRepository;
 import com.ef.parser.LogEntry;
-import com.ef.repository.LogEntryRepository;
 
 /**
  * @author goobar

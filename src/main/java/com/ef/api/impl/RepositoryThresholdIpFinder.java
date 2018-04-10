@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import com.ef.api.Duration;
 import com.ef.api.ThresholdFinderException;
 import com.ef.api.ThresholdIpFinder;
-import com.ef.repository.LogEntryRepository;
 
 /**
  * Implementation using repository to perform queries.
