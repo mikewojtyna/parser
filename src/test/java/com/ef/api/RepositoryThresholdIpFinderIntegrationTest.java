@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
+import com.ef.api.impl.BlockedIp;
+import com.ef.api.impl.BlockedIpRepository;
 import com.ef.parser.LogEntry;
 import com.ef.repository.LogEntryRepository;
 
@@ -26,6 +28,9 @@ import com.ef.repository.LogEntryRepository;
 @SuppressWarnings("javadoc")
 public class RepositoryThresholdIpFinderIntegrationTest
 {
+	@Autowired
+	private BlockedIpRepository blockedIpRepository;
+
 	@Autowired
 	private ThresholdIpFinder finder;
 
@@ -57,6 +62,34 @@ public class RepositoryThresholdIpFinderIntegrationTest
 
 		// then
 		assertThat(ips).containsOnly("89.75.165.210");
+
+		Iterable<BlockedIp> blockedIps = blockedIpRepository.findAll();
+		assertThat(blockedIps).hasSize(1);
+		assertThat(blockedIps.iterator().next().getIp())
+			.isEqualTo("89.75.165.210");
+	}
+
+	@Test
+	@Transactional
+	public void should_SaveBlockedIps() throws Exception
+	{
+		// given
+		repository.save(LogEntry.LogEntryBuilder.instance()
+			.withIp("89.75.165.210")
+			.withDate(LocalDateTime.of(2010, 10, 20, 20, 45))
+			.build());
+
+		// when
+		finder.findAboveThreshold(0,
+			LocalDateTime.of(2010, 10, 20, 19, 50),
+			Duration.HOURLY);
+
+		// then
+		Iterable<BlockedIp> blockedIps = blockedIpRepository.findAll();
+		assertThat(blockedIps).hasSize(1);
+		BlockedIp blockedIp = blockedIps.iterator().next();
+		assertThat(blockedIp.getIp()).isEqualTo("89.75.165.210");
+		assertThat(blockedIp.getComment()).isNotEmpty();
 	}
 
 	/**

@@ -4,8 +4,10 @@
 package com.ef.api.impl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import com.ef.api.Duration;
 import com.ef.api.ThresholdFinderException;
@@ -22,19 +24,25 @@ import com.ef.repository.LogEntryRepository;
 public class RepositoryThresholdIpFinder implements ThresholdIpFinder
 {
 
+	private final BlockedIpRepository blockedIpRepository;
+
 	private final LogEntryRepository repository;
 
 	/**
 	 * @param repository
 	 *                a repository
+	 * @param blockedIpRepository
+	 *                a repository to store blocked ips
 	 * @throws NullPointerException
 	 *                 if any argument is null
 	 */
-	public RepositoryThresholdIpFinder(LogEntryRepository repository)
+	public RepositoryThresholdIpFinder(LogEntryRepository repository,
+		BlockedIpRepository blockedIpRepository)
 		throws NullPointerException
 	{
-		validate(repository);
+		validate(repository, blockedIpRepository);
 		this.repository = repository;
+		this.blockedIpRepository = blockedIpRepository;
 	}
 
 	/* (non-Javadoc)
@@ -46,8 +54,14 @@ public class RepositoryThresholdIpFinder implements ThresholdIpFinder
 		throws NullPointerException, ThresholdFinderException
 	{
 		validate(threshold, startDate, duration);
-		return repository.findIpsAboveThreshold(threshold, startDate,
+		Collection<String> ips = repository.findIpsAboveThreshold(
+			threshold, startDate,
 			calculateEndDate(startDate, duration));
+		blockedIpRepository.saveAll(ips.stream()
+			.map(ip -> new BlockedIp(ip,
+				comment(ip, threshold, startDate, duration)))
+			.collect(Collectors.toList()));
+		return ips;
 	}
 
 	/**
@@ -72,6 +86,21 @@ public class RepositoryThresholdIpFinder implements ThresholdIpFinder
 	 * @param threshold
 	 * @param startDate
 	 * @param duration
+	 * @return
+	 */
+	private String comment(String ip, int threshold,
+		LocalDateTime startDate, Duration duration)
+	{
+		// TODO: should use i18n MessageSource instead
+		return MessageFormat.format(
+			"IP {0} blocked. Too many connections (> {1}) made {2} starting from {3} date.",
+			ip, threshold, duration, startDate);
+	}
+
+	/**
+	 * @param threshold
+	 * @param startDate
+	 * @param duration
 	 */
 	private void validate(int threshold, LocalDateTime startDate,
 		Duration duration)
@@ -82,10 +111,14 @@ public class RepositoryThresholdIpFinder implements ThresholdIpFinder
 
 	/**
 	 * @param repository
+	 * @param blockedIpRepository
 	 */
-	private void validate(LogEntryRepository repository)
+	private void validate(LogEntryRepository repository,
+		BlockedIpRepository blockedIpRepository)
 	{
 		checkNotNull(repository, "'repository' cannot be null");
+		checkNotNull(blockedIpRepository,
+			"'blockedIpRepository' cannot be null");
 	}
 
 }

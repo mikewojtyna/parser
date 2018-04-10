@@ -13,6 +13,7 @@ import java.util.Random;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import com.ef.api.impl.BlockedIpRepository;
 import com.ef.api.impl.RepositoryThresholdIpFinder;
 import com.ef.repository.LogEntryRepository;
 import com.google.common.testing.NullPointerTester;
@@ -36,7 +37,8 @@ public class RepositoryThresholdIpFinderTest
 	public void setUp() throws Exception
 	{
 		repository = mock(LogEntryRepository.class);
-		thresholdIpFinder = new RepositoryThresholdIpFinder(repository);
+		thresholdIpFinder = new RepositoryThresholdIpFinder(repository,
+			mock(BlockedIpRepository.class));
 	}
 
 	@Test
