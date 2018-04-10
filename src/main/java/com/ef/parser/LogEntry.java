@@ -35,18 +35,6 @@ public class LogEntry
 
 	private final String userAgent;
 
-	/**
-	 * Do not use. Required only by Hibernate.
-	 */
-	private LogEntry()
-	{
-		ip = null;
-		request = null;
-		statusCode = null;
-		userAgent = null;
-		date = null;
-	}
-
 	private LogEntry(LogEntryBuilder builder)
 	{
 		date = builder.date;
